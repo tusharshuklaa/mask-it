@@ -6,7 +6,7 @@
   // Load masks when page loads
   chrome.storage.local.get(url, function(data) {
     if (data[url]) {
-      applyMasks(data[url] as string[]);
+      applyMasks(data[url] as Array<string>);
     }
   });
   
@@ -32,44 +32,126 @@
     return true;
   });
   
-  // Helper function to generate a unique selector for an element
-  function generateSelector(element: Element): string {
-    if (element.id) {
-      return '#' + element.id;
-    }
-    
-    if (element.className && typeof element.className === 'string') {
-      const classes = element.className.split(' ').filter(c => c.trim().length > 0);
-      if (classes.length > 0) {
-        return '.' + classes.join('.');
-      }
-    }
-    
-    let path = '';
-    let current: Node | null = element;
-    
-    while (current && current.nodeType === Node.ELEMENT_NODE) {
-      const el = current as Element;
-      let selector = el.nodeName.toLowerCase();
-      let sibling: Element | null = el;
-      let siblingIndex = 1;
-      
-      while (sibling = sibling.previousElementSibling) {
-        if (sibling.nodeName.toLowerCase() === selector) {
-          siblingIndex++;
-        }
-      }
-      
-      if (siblingIndex > 1) {
-        selector += ':nth-of-type(' + siblingIndex + ')';
-      }
-      
-      path = selector + (path ? ' > ' + path : '');
-      current = current.parentNode;
-    }
-    
-    return path;
+  /**
+ * Generates a unique and reliable CSS selector for any DOM element
+ * This handles elements without IDs or classes and ensures uniqueness even with similar elements
+ */
+function generateUniqueSelector(element: Element): string {
+  // Try to use ID if available (most specific)
+  if (element.id) {
+    return '#' + CSS.escape(element.id);
   }
+  
+  // Check if the element has any attribute that could be identifying
+  // like data-* attributes, name, etc.
+  const dataAttributes = Array.from(element.attributes)
+    .filter(attr => attr.name.startsWith('data-') || 
+                    ['name', 'role', 'aria-label'].includes(attr.name));
+  
+  if (dataAttributes.length > 0) {
+    // Use attribute for selector with tag name for more specificity
+    const attr = dataAttributes[0];
+    return `${element.tagName.toLowerCase()}[${attr.name}="${CSS.escape(attr.value)}"]`;
+  }
+  
+  // Build a selector from the element's position in its siblings
+  const buildPathSegment = (el: Element): string => {
+    const tagName = el.tagName.toLowerCase();
+    
+    // Get all siblings with same tag
+    const siblings = Array.from(el.parentElement?.children || [])
+      .filter(sibling => sibling.tagName.toLowerCase() === tagName);
+    
+    // If element is unique among siblings by tag name
+    if (siblings.length === 1) {
+      return tagName;
+    }
+    
+    // Find the index position
+    const index = siblings.indexOf(el) + 1;
+    
+    // Add nth-of-type for uniqueness
+    return `${tagName}:nth-of-type(${index})`;
+  };
+  
+  // Build full path from element up to a unique parent
+  const buildFullPath = (): string => {
+    const path: string[] = [];
+    let currentElement: Element | null = element;
+    
+    // This safety counter prevents infinite loops
+    // in case of very deep DOM structures
+    let maxDepth = 10;
+    
+    while (currentElement && currentElement !== document.documentElement && maxDepth > 0) {
+      // Add current element to path
+      const segment = buildPathSegment(currentElement);
+      path.unshift(segment);
+      
+      // Check if we've built a unique selector so far
+      const partialSelector = path.join(' > ');
+      const matchingElements = document.querySelectorAll(partialSelector);
+      
+      // If we have a unique selector, we can stop
+      if (matchingElements.length === 1) {
+        return partialSelector;
+      }
+      
+      // Move up to parent
+      currentElement = currentElement.parentElement;
+      maxDepth--;
+    }
+    
+    // Add html tag as root if needed
+    if (path.length > 0) {
+      path.unshift('html');
+    }
+    
+    return path.join(' > ');
+  };
+  
+  // First attempt: Try to build a unique path
+  const pathSelector = buildFullPath();
+  
+  // Verify uniqueness of our selector
+  const matchingElements = document.querySelectorAll(pathSelector);
+  if (matchingElements.length === 1) {
+    return pathSelector;
+  }
+  
+  // If we still don't have a unique selector, add index-based nth-child selectors
+  // to get more specific by walking up the DOM tree
+  const buildPositionalSelector = (): string => {
+    const path: string[] = [];
+    let currentElement: Element | null = element;
+    
+    while (currentElement && currentElement !== document.documentElement) {
+      // For each element, add its tag with its position among all siblings
+      const tag = currentElement.tagName.toLowerCase();
+      
+      // Get its position among ALL siblings, not just same tag
+      const allSiblings = Array.from(currentElement.parentElement?.children || []);
+      const position = allSiblings.indexOf(currentElement) + 1;
+      
+      path.unshift(`${tag}:nth-child(${position})`);
+      
+      // Check if we have a unique path
+      const selector = path.join(' > ');
+      if (document.querySelectorAll(selector).length === 1) {
+        return selector;
+      }
+      
+      currentElement = currentElement.parentElement;
+    }
+    
+    // Add html tag as root
+    path.unshift('html');
+    return path.join(' > ');
+  };
+  
+  // Return the most specific selector
+  return buildPositionalSelector();
+}
   
   // Activate masking mode
   function activateMaskingMode(): void {
@@ -122,7 +204,7 @@
     element.classList.add('content-mask');
     
     // Save the masked element's selector to storage
-    const selector = generateSelector(element);
+    const selector = generateUniqueSelector(element);
     saveSelector(selector);
   }
   
@@ -143,21 +225,26 @@
   
   function saveSelector(selector: string): void {
     chrome.storage.local.get(url, function(data) {
-      const selectors: string[] = data[url] || [];
+      const selectors: Array<string> = data[url] || [];
       
       // Only add the selector if it's not already saved
       if (!selectors.includes(selector)) {
-        selectors.push(selector);
+        // Remove mask class from selector
+        const actualSelector = selector
+          .replace('.content-mask', '')
+          .replace('.mask-selector-hover', '')
+          .replace('.mask-selector', '');
+        selectors.push(actualSelector);
         
         // Save to Chrome storage
-        const saveData: Record<string, string[]> = {};
+        const saveData: Record<string, Array<string>> = {};
         saveData[url] = selectors;
         chrome.storage.local.set(saveData);
       }
     });
   }
   
-  function applyMasks(selectors: string[]): void {
+  function applyMasks(selectors: Array<string>): void {
     selectors.forEach(selector => {
       try {
         const elements = document.querySelectorAll(selector);
@@ -178,7 +265,7 @@
     });
     
     // Clear saved selectors for this URL
-    const clearData: Record<string, string[]> = {};
+    const clearData: Record<string, Array<string>> = {};
     clearData[url] = [];
     chrome.storage.local.set(clearData);
   }
