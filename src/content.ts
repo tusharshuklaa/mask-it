@@ -226,10 +226,6 @@ function generateUniqueSelector(element: Element): string {
   function saveSelector(selector: string): void {
     chrome.storage.local.get(url, function(data) {
       const selectors: Array<string> = data[url] || [];
-
-      console.log('🚀 -----------------------------------------------------🚀');
-      console.log('🚀 ~ chrome.storage.local.get ~ selectors:', selectors);
-      console.log('🚀 -----------------------------------------------------🚀');
       
       // Only add the selector if it's not already saved
       if (!selectors.includes(selector)) {
@@ -243,16 +239,12 @@ function generateUniqueSelector(element: Element): string {
         // Save to Chrome storage
         const saveData: Record<string, Array<string>> = {};
         saveData[url] = selectors;
-        console.log('🚀 ---------------------------------------------------🚀');
-        console.log('🚀 ~ chrome.storage.local.get ~ saveData:', saveData);
-        console.log('🚀 ---------------------------------------------------🚀');
         chrome.storage.local.set(saveData);
       }
     });
   }
   
   function applyMasks(selectors: Array<string>): void {
-    console.log('Applying masks:', selectors);
     selectors.forEach(selector => {
       try {
         const elements = document.querySelectorAll(selector);
