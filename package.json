@@ -16,7 +16,7 @@
     "mask-selection"
   ],
   "author": "Tushar Shukla (https://tusharshukla.dev)",
-  "license": "ISC",
+  "license": "MIT",
   "description": "A Chrome extension to mask DOM elements and save selections for future visits. Helps hiding unwanted content on any website.",
   "devDependencies": {
     "@types/chrome": "^0.0.308",
