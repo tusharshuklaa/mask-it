@@ -1,0 +1,39 @@
+.content-mask {
+  background: #333 !important;
+  color: transparent !important;
+  border: 0px solid transparent !important;
+  outline: 0 solid red !important;
+  user-select: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  filter: blur(1px) !important;
+}
+
+.content-mask * {
+  visibility: hidden !important;
+}
+
+.content-mask::after {
+  content: "🚫" !important;
+  color: white !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  visibility: visible !important;
+  font-size: 6px !important;
+  font-size: clamp(6px, 1cqw, 24px) !important;
+}
+
+.content-mask .content-mask::after {
+  content: "" !important;
+}
+
+.mask-selector {
+  cursor: crosshair !important;
+}
+
+.mask-selector-hover {
+  outline: 2px dashed greenyellow !important;
+}
