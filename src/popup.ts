@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const clearButton = $id("clearMasks") as HTMLButtonElement;
   const statusDiv = $id("status") as HTMLDivElement;
   const maskedItemsContainer = $id("maskedItems") as HTMLDivElement;
+  const maskedItemsTitle = $id("maskedItemsTitle") as HTMLHeadingElement;
+  const maskedItemsCount = $id("count") as HTMLSpanElement;
 
   // Check if masking mode is already active
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -35,12 +37,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderMaskedItems(items: Array<MaskedElement>): void {
     maskedItemsContainer.innerHTML = "";
-    
-    const title = document.createElement('h3');
-    title.textContent = "Masked Elements";
-    maskedItemsContainer.appendChild(title);
+
+    maskedItemsTitle.classList.remove("hide");
+    maskedItemsCount.textContent = items.length.toString();
     
     const list = document.createElement('ul');
+    list.id = "maskedItemsList";
     list.className = "masked-items-list";
     
     items.forEach((item, index) => {
@@ -57,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Create unmask button
       const unmaskBtn = document.createElement('button');
       unmaskBtn.textContent = "Unmask";
-      unmaskBtn.className = "unmask-btn";
+      unmaskBtn.className = "button mini";
       unmaskBtn.addEventListener('click', () => {
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
           if (!tabs[0].id) return;
@@ -91,12 +93,12 @@ document.addEventListener("DOMContentLoaded", function () {
       if (isActive) {
         // Deactivate masking mode
         chrome.tabs.sendMessage(tabs[0].id, { action: "deactivateMasking" });
-        toggleButton.textContent = "Start Masking Elements";
+        toggleButton.textContent = "Start Masking";
         toggleButton.classList.remove("active");
       } else {
         // Activate masking mode
         chrome.tabs.sendMessage(tabs[0].id, { action: "activateMasking" });
-        toggleButton.textContent = "Stop Masking Elements";
+        toggleButton.textContent = "Stop Masking";
         toggleButton.classList.add("active");
       }
     });
@@ -107,9 +109,21 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!tabs[0].id) return;
 
       chrome.tabs.sendMessage(tabs[0].id, { action: "clearMasks" });
-      statusDiv.textContent = "All masks cleared for this page!";
+      statusDiv.classList.add("show");
+      maskedItemsContainer.innerHTML = "<p>No masked elements on this page.</p>";
+      const list = document.getElementById("maskedItemsList");
+      const listTitle = document.getElementById("maskedItemsTitle");
+
+      if (list) {
+        list.remove();
+      }
+
+      if (listTitle) {
+        listTitle.classList.add("hide");
+      }
+
       setTimeout(() => {
-        statusDiv.textContent = "";
+        statusDiv.classList.remove("show");
       }, 2000);
     });
   });
