@@ -6,13 +6,20 @@
     "permissions": [
         "storage",
         "activeTab",
-        "scripting"
+        "scripting",
+        "contextMenus"
     ],
     "background": {
         "service_worker": "background.js"
     },
     "action": {
-        "default_popup": "popup.html"
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "32": "icons/icon32.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
     },
     "content_scripts": [
         {
@@ -22,10 +29,26 @@
             "js": [
                 "content.js"
             ],
-            "css": ["style.css"]
+            "css": [
+                "style.css"
+            ]
         }
     ],
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "commands": {
+        "toggle-masking": {
+            "suggested_key": {
+                "default": "Alt+Shift+K"
+            },
+            "description": "Toggle masking mode"
+        },
+        "unmask-last": {
+            "suggested_key": {
+                "default": "Alt+Shift+L"
+            },
+            "description": "Unmask last masked element"
+        }
     }
 }

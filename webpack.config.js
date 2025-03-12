@@ -30,6 +30,7 @@ module.exports = {
         { from: "src/manifest.json", to: "." },
         { from: "src/popup.html", to: "." },
         { from: "src/style.css", to: "." },
+        { from: "icons", to: "icons" },
       ],
     }),
   ],
