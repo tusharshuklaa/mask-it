@@ -2,32 +2,58 @@
 <html>
 
 <head>
-  <title>Content Masker</title>
+  <title>Mask It</title>
   <style>
     body {
       width: 300px;
       padding: 10px;
       font-family: Arial, sans-serif;
     }
-
     button {
       width: 100%;
       padding: 8px;
       margin: 5px 0;
       cursor: pointer;
     }
-
     .active {
       background-color: #ff9999;
+    }
+    #maskedItems {
+      margin-top: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .masked-items-list {
+      list-style: none;
+      padding: 0;
+    }
+    .masked-items-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    .unmask-btn {
+      width: auto;
+      padding: 3px 8px;
+      margin: 0 0 0 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    h3 {
+      margin-bottom: 5px;
     }
   </style>
 </head>
 
 <body>
-  <h2>Content Masker</h2>
+  <h2>Mask It</h2>
   <button id="toggleMaskMode">Start Masking Elements</button>
   <button id="clearMasks">Clear All Masks on This Page</button>
   <div id="status"></div>
+  <div id="maskedItems"></div>
   <script src="popup.js"></script>
 </body>
 

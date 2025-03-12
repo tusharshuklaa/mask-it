@@ -10,3 +10,8 @@ export type StatusResponse = {
 export type ActionResponse = {
   success: boolean;
 };
+
+export type MaskedElement = {
+  selector: string;
+  timestamp: number;
+};
