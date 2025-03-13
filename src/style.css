@@ -1,5 +1,16 @@
-.content-mask {
-  background: #333 !important;
+.__mskit_invisible {
+  visibility: hidden !important;
+}
+
+.__mskit_invisible * {
+  visibility: hidden !important;
+}
+
+.__mskit_invisible::after {
+  content: "" !important;
+}
+
+.__mskit_mask {
   color: transparent !important;
   border: 0px solid transparent !important;
   outline: 0 solid red !important;
@@ -7,15 +18,43 @@
   position: relative !important;
   overflow: hidden !important;
   pointer-events: none !important;
-  filter: blur(1px) !important;
+  filter: blur(0px) !important;
 }
 
-.content-mask * {
+.__mskit_mask.__mskit_dark {
+  background: #333 !important;
+}
+
+.__mskit_mask.__mskit_light {
+  background: #fff !important;
+}
+
+.__mskit_mask.__mskit_soothing {
+  background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%) !important;
+}
+
+.__mskit_mask.__mskit_lilly {
+  background: linear-gradient(90deg, #efd5ff 0%, #515ada 100%) !important;
+}
+
+.__mskit_mask.__mskit_rose {
+  background: linear-gradient(90deg, #ffafbd 0%, #ffc3a0 100%) !important;
+}
+
+.__mskit_mask.__mskit_sky {
+  background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%) !important;
+}
+
+.__mskit_mask.__mskit_ocean {
+  background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%) !important;
+}
+
+.__mskit_mask * {
   visibility: hidden !important;
 }
 
-.content-mask::after {
-  content: "🚫" !important;
+.__mskit_mask::after {
+  content: attr(data-mask-content) !important;
   color: white !important;
   position: absolute !important;
   top: 50% !important;
@@ -26,14 +65,14 @@
   font-size: clamp(6px, 1cqw, 24px) !important;
 }
 
-.content-mask .content-mask::after {
+.__mskit_mask .__mskit_mask::after {
   content: "" !important;
 }
 
-.mask-selector {
+.__mskit_mask-selector {
   cursor: crosshair !important;
 }
 
-.mask-selector-hover {
+.__xmskit_mask-selector-hover {
   outline: 2px dashed greenyellow !important;
 }

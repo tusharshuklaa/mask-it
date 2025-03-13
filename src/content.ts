@@ -2,6 +2,34 @@
   let isMaskingActive = false;
   let hoverElement: Element | null = null;
   const url = window.location.href;
+  const maskingClass = "__mskit_mask";
+  const maskMode = "__mskit_mask-selector";
+  const maskModeHover = "__xmskit_mask-selector-hover";
+  const THEME_MAP = {
+    dark: "__mskit_dark",
+    light: "__mskit_light",
+    soothing: "__mskit_soothing",
+    lilly: "__mskit_lilly",
+    rose: "__mskit_rose",
+    sky: "__mskit_sky",
+    ocean: "__mskit_ocean",
+  } as const;
+
+  type ThemeName = keyof typeof THEME_MAP;
+
+  const THEMES = Object.keys(THEME_MAP).reduce(
+    (theme, curr) => {
+      theme[curr as ThemeName] = curr as ThemeName;
+      return theme;
+    },
+    {} as Record<ThemeName, ThemeName>
+  );
+
+  type MaskingOptions = {
+    theme: ThemeName;
+    defaultContent: string;
+    maskingBehavior: string;
+  };
 
   // Store masked elements with timestamps
   type MaskedElement = {
@@ -10,7 +38,7 @@
   };
 
   // Setup mutation observer for SPAs
-  const observer = new MutationObserver((mutations) => {
+  const observer = new MutationObserver(() => {
     // If DOM has changed, reapply masks
     chrome.storage.local.get(url, (data) => {
       if (data[url] && Array.isArray(data[url])) {
@@ -45,7 +73,7 @@
   // Listen for messages from popup or background
   chrome.runtime.onMessage.addListener(function (
     request,
-    sender,
+    _sender,
     sendResponse
   ) {
     switch (request.action) {
@@ -88,10 +116,10 @@
     }
 
     // Check if the element has any attribute that could be identifying
-    // like data-* attributes, name, etc.
+    // like data-* attributes, name, etc except data-mask-content.
     const dataAttributes = Array.from(element.attributes).filter(
       (attr) =>
-        attr.name.startsWith("data-") ||
+        (attr.name.startsWith("data-") && attr.name !== "data-mask-content") ||
         ["name", "role", "aria-label"].includes(attr.name)
     );
 
@@ -126,12 +154,12 @@
 
     // Build full path from element up to a unique parent
     const buildFullPath = (): string => {
-      const path: string[] = [];
+      const path: Array<string> = [];
       let currentElement: Element | null = element;
 
       // This safety counter prevents infinite loops
       // in case of very deep DOM structures
-      let maxDepth = 10;
+      let maxDepth = 20;
 
       while (
         currentElement &&
@@ -176,7 +204,7 @@
     // If we still don't have a unique selector, add index-based nth-child selectors
     // to get more specific by walking up the DOM tree
     const buildPositionalSelector = (): string => {
-      const path: string[] = [];
+      const path: Array<string> = [];
       let currentElement: Element | null = element;
 
       while (currentElement && currentElement !== document.documentElement) {
@@ -212,7 +240,7 @@
   // Activate masking mode
   function activateMaskingMode(): void {
     isMaskingActive = true;
-    document.body.classList.add("mask-selector");
+    document.body.classList.add(maskMode);
 
     // Mouse over event to highlight elements
     document.addEventListener("mouseover", mouseOverHandler);
@@ -229,21 +257,41 @@
 
     const target = e.target as Element;
 
-    const isAlreadyMasked = target.classList.contains("content-mask");
+    const isAlreadyMasked = target.classList.contains(maskingClass);
 
     // Remove highlight from previous element
     if (hoverElement) {
-      hoverElement.classList.remove("mask-selector-hover");
+      hoverElement.classList.remove(maskModeHover);
     }
 
     if (!isAlreadyMasked) {
       // Add highlight to current element
       hoverElement = target;
-      hoverElement.classList.add("mask-selector-hover");
+      hoverElement.classList.add(maskModeHover);
     }
   }
 
-  function clickHandler(e: MouseEvent): void {
+  function getMaskingOptions(): Promise<MaskingOptions> {
+    return new Promise((resolve) => {
+      chrome.storage.sync.get({
+        theme: THEMES.dark,
+        defaultContent: '🚫',
+        maskingBehavior: '__mskit_mask'
+      },
+      (options: MaskingOptions) => resolve(options));
+    });
+  }
+
+  function getMaskingClasses(maskingOptions: MaskingOptions): Array<string> {
+    const maskingClasses = [
+      THEME_MAP[maskingOptions.theme],
+      maskingOptions.maskingBehavior,
+    ];
+
+    return maskingClasses;
+  }
+
+  async function clickHandler(e: MouseEvent): Promise<void> {
     if (!isMaskingActive) return;
 
     e.preventDefault();
@@ -252,25 +300,29 @@
     const element = e.target as Element;
 
     // Don't mask elements that are already masked
-    if (element.classList.contains("content-mask")) {
+    if (element.className.includes("__mskit")) {
       return;
     }
 
-    // Add mask class
-    element.classList.add("content-mask");
-
+    const maskingOptions = await getMaskingOptions();
+    const allMaskingClasses = getMaskingClasses(maskingOptions);
     // Save the masked element's selector to storage
     const selector = generateUniqueSelector(element);
+
+    // Add mask class
+    element.classList.add(...allMaskingClasses);
+    element.setAttribute('data-mask-content', maskingOptions.defaultContent);
+
     saveSelector(selector);
   }
 
   function deactivateMaskingMode(): void {
     isMaskingActive = false;
-    document.body.classList.remove("mask-selector");
+    document.body.classList.remove(maskMode);
 
     // Remove hover highlight
     if (hoverElement) {
-      hoverElement.classList.remove("mask-selector-hover");
+      hoverElement.classList.remove(maskModeHover);
       hoverElement = null;
     }
 
@@ -286,10 +338,11 @@
       // Only add the selector if it's not already saved
       if (!maskedElements.some((item) => item.selector === selector)) {
         // Remove mask class from selector
-        const actualSelector = selector
-          .replace(".content-mask", "")
-          .replace(".mask-selector-hover", "")
-          .replace(".mask-selector", "");
+        const maskingClasses = selector.split(".").filter((cls) => cls.startsWith("__mskit_")).map((cls) => `.${cls}`);
+        let actualSelector = selector;
+        maskingClasses.forEach((cls) => {
+          actualSelector = selector.replace(cls, "");
+        });
 
         maskedElements.push({
           selector: actualSelector,
@@ -297,19 +350,23 @@
         });
 
         // Save to Chrome storage
-        const saveData: Record<string, MaskedElement[]> = {};
+        const saveData: Record<string, Array<MaskedElement>> = {};
         saveData[url] = maskedElements;
         chrome.storage.local.set(saveData);
       }
     });
   }
 
-  function applyMasks(selectors: Array<string>): void {
+  async function applyMasks(selectors: Array<string>): Promise<void> {
+    const maskingOptions = await getMaskingOptions();
+    const allMaskingClasses = getMaskingClasses(maskingOptions);
+
     selectors.forEach((selector) => {
       try {
         const elements = document.querySelectorAll(selector);
         elements.forEach((el) => {
-          el.classList.add("content-mask");
+          el.setAttribute('data-mask-content', maskingOptions.defaultContent);
+          el.classList.add(...allMaskingClasses);
         });
       } catch (e) {
         console.error("Invalid selector:", selector, e);
@@ -317,15 +374,20 @@
     });
   }
 
+  function getElementMaskingClasses(element: Element): Array<string> {
+    return Array.from(element.classList).filter((cls) => cls.startsWith("__mskit_"));
+  }
+
   function clearMasks(): void {
     // Remove mask class from all elements
-    const maskedElements = document.querySelectorAll(".content-mask");
+    const maskedElements = document.querySelectorAll('[class*="__mskit_"]');
     maskedElements.forEach((el) => {
-      el.classList.remove("content-mask");
+      const maskingClasses = getElementMaskingClasses(el);
+      el.classList.remove(...maskingClasses);
     });
 
     // Clear saved selectors for this URL
-    const clearData: Record<string, MaskedElement[]> = {};
+    const clearData: Record<string, Array<MaskedElement>> = {};
     clearData[url] = [];
     chrome.storage.local.set(clearData);
 
@@ -348,17 +410,18 @@
       // Remove mask from DOM
       const elements = document.querySelectorAll(selector);
       elements.forEach((el) => {
-        el.classList.remove("content-mask");
+        const maskingClasses = getElementMaskingClasses(el);
+        el.classList.remove(...maskingClasses);
       });
 
       // Remove from storage
       chrome.storage.local.get(url, function (data) {
-        const maskedElements: MaskedElement[] = data[url] || [];
+        const maskedElements: Array<MaskedElement> = data[url] || [];
         const updatedElements = maskedElements.filter(
           (item) => item.selector !== selector
         );
 
-        const saveData: Record<string, MaskedElement[]> = {};
+        const saveData: Record<string, Array<MaskedElement>> = {};
         saveData[url] = updatedElements;
         chrome.storage.local.set(saveData);
 
@@ -384,7 +447,7 @@
       } else if (message.action === "unmask-last-shortcut") {
         // Unmask the most recently masked element
         chrome.storage.local.get(url, function (data) {
-          const maskedElements: MaskedElement[] = data[url] || [];
+          const maskedElements: Array<MaskedElement> = data[url] || [];
           if (maskedElements.length > 0) {
             // Sort by timestamp (newest first)
             maskedElements.sort((a, b) => b.timestamp - a.timestamp);

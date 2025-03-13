@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
         function (response: { isMaskingActive: boolean } | undefined) {
           if (response && response.isMaskingActive) {
             toggleButton.textContent = "Stop Masking Elements";
-            toggleButton.classList.add("active");
+            toggleButton.classList.add("__mskit_active");
           }
         }
       );
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderMaskedItems(items: Array<MaskedElement>): void {
     maskedItemsContainer.innerHTML = "";
 
-    maskedItemsTitle.classList.remove("hide");
+    maskedItemsTitle.classList.remove("__mskit_hide");
     maskedItemsCount.textContent = items.length.toString();
     
     const list = document.createElement('ul');
@@ -88,18 +88,18 @@ document.addEventListener("DOMContentLoaded", function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       if (!tabs[0].id) return;
 
-      const isActive = toggleButton.classList.contains("active");
+      const isActive = toggleButton.classList.contains("__mskit_active");
 
       if (isActive) {
         // Deactivate masking mode
         chrome.tabs.sendMessage(tabs[0].id, { action: "deactivateMasking" });
         toggleButton.textContent = "Start Masking";
-        toggleButton.classList.remove("active");
+        toggleButton.classList.remove("__mskit_active");
       } else {
         // Activate masking mode
         chrome.tabs.sendMessage(tabs[0].id, { action: "activateMasking" });
         toggleButton.textContent = "Stop Masking";
-        toggleButton.classList.add("active");
+        toggleButton.classList.add("__mskit_active");
       }
     });
   });
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!tabs[0].id) return;
 
       chrome.tabs.sendMessage(tabs[0].id, { action: "clearMasks" });
-      statusDiv.classList.add("show");
+      statusDiv.classList.add("__mskit_show");
       maskedItemsContainer.innerHTML = "<p>No masked elements on this page.</p>";
       const list = document.getElementById("maskedItemsList");
       const listTitle = document.getElementById("maskedItemsTitle");
@@ -119,11 +119,11 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       if (listTitle) {
-        listTitle.classList.add("hide");
+        listTitle.classList.add("__mskit_hide");
       }
 
       setTimeout(() => {
-        statusDiv.classList.remove("show");
+        statusDiv.classList.remove("__mskit_show");
       }, 2000);
     });
   });
