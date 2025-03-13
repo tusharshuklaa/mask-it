@@ -9,7 +9,7 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            max-width: 500px;
+            max-width: 600px;
             margin: 0 auto;
         }
 
@@ -36,18 +36,39 @@
             margin-left: 10px;
         }
 
+        .btnContainer {
+            display: flex;
+            justify-content: center;
+            margin-top: 4rem;
+        }
+
         button {
-            margin-top: 2rem;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
+            padding: 1em 1.5em;
+            border-radius: 0.6em;
+            border: 0;
+            background-color: rgb(255, 56, 86);
+            letter-spacing: 1.5px;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            box-shadow: rgb(201, 46, 70) 0px 0.6em 0px 0px;
+            color: hsl(0, 0%, 100%);
             cursor: pointer;
         }
 
         button:hover {
-            background-color: #0056b3;
+            box-shadow: rgb(201, 46, 70) 0px 0.4em 0px 0px;
+            transform: translateY(0.3em);
+        }
+
+        button:active {
+            background-color: rgb(255, 56, 86);
+            box-shadow: rgb(201, 46, 70) 0px 0px 0px 0px;
+            transform: translateY(0.3em);
+            transition: 200ms;
+        }
+
+        .form {
+            width: 100%;
         }
 
         .masking-behavior {
@@ -57,7 +78,11 @@
 
         .container {
             display: flex;
-            gap: 2rem;
+            gap: 4em;
+            align-items: center;
+            border: 1px solid black;
+            border-radius: 0.5rem;
+            padding: 2rem;
         }
 
         .preview {
@@ -68,6 +93,49 @@
             justify-content: center;
             border-radius: 1em;
             box-shadow: 5px 5px 10px 0 lightseagreen;
+            flex: 0 0 auto;
+        }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: aliceblue;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        footer > div {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .behaviour {
+            margin-bottom: 3rem;
+            border: 1px solid black;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .behaviour > div {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .mini-title {
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 3rem;
         }
     </style>
 </head>
@@ -77,15 +145,17 @@
 
     <!-- Masking Behavior -->
     <div class="behaviour">
-        <label>Masking Behavior:</label>
-        <label class="masking-behavior">
-            <span>Add Masking Layer</span>
-            <input type="radio" name="masking-behavior" value="__mskit_mask" checked>
-        </label>
-        <label class="masking-behavior">
-            <span>Make Content Invisible</span>
-            <input type="radio" name="masking-behavior" value="__mskit_invisible">
-        </label>
+        <label class="mini-title">Masking Behavior:</label>
+        <div>
+            <label class="masking-behavior">
+                <span>Add Masking Layer</span>
+                <input type="radio" name="masking-behavior" value="__mskit_mask" checked>
+            </label>
+            <label class="masking-behavior">
+                <span>Make Content Invisible</span>
+                <input type="radio" name="masking-behavior" value="__mskit_invisible">
+            </label>
+        </div>
     </div>
 
     <div class="container" id="maskOptions">
@@ -123,7 +193,17 @@
     </div>
 
     <!-- Save Button -->
-    <button id="save">Save Options</button>
+    <div class="btnContainer">
+        <button id="save">Save</button>
+    </div>
+
+    <footer>
+        <p>Mask It - v1.0.0</p>
+        <div>
+            <a target="_blank" href="https://github.com/tusharshuklaa/mask-it">Find this on Github</a>
+            <a target="_blank" href="https://tusharshukla.dev">Created by Tushar Shukla</a>
+        </div>
+    </footer>
 
     <script src="options.js"></script>
 </body>
