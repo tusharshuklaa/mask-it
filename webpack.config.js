@@ -7,6 +7,7 @@ module.exports = {
     content: "./src/content.ts",
     background: "./src/background.ts",
     popup: "./src/popup.ts",
+    options: "./src/options.ts",
   },
   output: {
     filename: "[name].js",
@@ -29,6 +30,7 @@ module.exports = {
       patterns: [
         { from: "src/manifest.json", to: "." },
         { from: "src/popup.html", to: "." },
+        { from: "src/options.html", to: "." },
         { from: "src/style.css", to: "." },
         { from: "icons", to: "icons" },
       ],

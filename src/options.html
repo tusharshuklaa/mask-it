@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>MaskIt Options</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+        }
+
+        select,
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="radio"] {
+            margin-left: 10px;
+        }
+
+        .btnContainer {
+            display: flex;
+            justify-content: center;
+            margin-top: 4rem;
+        }
+
+        button {
+            padding: 1em 1.5em;
+            border-radius: 0.6em;
+            border: 0;
+            background-color: rgb(255, 56, 86);
+            letter-spacing: 1.5px;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            box-shadow: rgb(201, 46, 70) 0px 0.6em 0px 0px;
+            color: hsl(0, 0%, 100%);
+            cursor: pointer;
+        }
+
+        button:hover {
+            box-shadow: rgb(201, 46, 70) 0px 0.4em 0px 0px;
+            transform: translateY(0.3em);
+        }
+
+        button:active {
+            background-color: rgb(255, 56, 86);
+            box-shadow: rgb(201, 46, 70) 0px 0px 0px 0px;
+            transform: translateY(0.3em);
+            transition: 200ms;
+        }
+
+        .form {
+            width: 100%;
+        }
+
+        .masking-behavior {
+            display: flex;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 4em;
+            align-items: center;
+            border: 1px solid black;
+            border-radius: 0.5rem;
+            padding: 2rem;
+        }
+
+        .preview {
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1em;
+            box-shadow: 5px 5px 10px 0 lightseagreen;
+            flex: 0 0 auto;
+        }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: aliceblue;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        footer > div {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .behaviour {
+            margin-bottom: 3rem;
+            border: 1px solid black;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .behaviour > div {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .mini-title {
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Mask It - Options</h1>
+
+    <!-- Masking Behavior -->
+    <div class="behaviour">
+        <label class="mini-title">Masking Behavior:</label>
+        <div>
+            <label class="masking-behavior">
+                <span>Add Masking Layer</span>
+                <input type="radio" name="masking-behavior" value="__mskit_mask" checked>
+            </label>
+            <label class="masking-behavior">
+                <span>Make Content Invisible</span>
+                <input type="radio" name="masking-behavior" value="__mskit_invisible">
+            </label>
+        </div>
+    </div>
+
+    <div class="container" id="maskOptions">
+        <div class="form">
+            <!-- Theme Selection -->
+            <label for="theme">Masked Content Theme:</label>
+            <select id="theme">
+                <option value="dark">Dark Theme</option>
+                <option value="light">Light Theme</option>
+                <option value="soothing">Soothing Theme</option>
+                <option value="lilly">Lilly Theme</option>
+                <option value="rose">Rose Theme</option>
+                <option value="sky">Sky Theme</option>
+                <option value="ocean">Ocean Theme</option>
+            </select>
+
+            <!-- Default Content -->
+            <label for="default-content">Default Content Inside Masking Box:</label>
+            <select id="default-content">
+                <option value="🚫">🚫</option>
+                <option value="">Empty</option>
+                <option value="🤐">🤐</option>
+                <option value="😶‍🌫️">😶‍🌫️</option>
+                <option value="☠️">☠️</option>
+                <option value="🙈">🙈</option>
+                <option value="🙅🏻">🙅🏻</option>
+                <option value="💩">💩</option>
+                <option value="NSFW">NSFW</option>
+                <option value="Blocked">Blocked</option>
+                <option value="Masked">Masked</option>
+            </select>
+        </div>
+
+        <div id="previewBox" class="preview __mskit_mask __cm_dark" data-mask-content="🚫"></div>
+    </div>
+
+    <!-- Save Button -->
+    <div class="btnContainer">
+        <button id="save">Save</button>
+    </div>
+
+    <footer>
+        <p>Mask It - v1.0.0</p>
+        <div>
+            <a target="_blank" href="https://github.com/tusharshuklaa/mask-it">Find this on Github</a>
+            <a target="_blank" href="https://tusharshukla.dev">Created by Tushar Shukla</a>
+        </div>
+    </footer>
+
+    <script src="options.js"></script>
+</body>
+
+</html>
