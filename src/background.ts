@@ -5,8 +5,6 @@ chrome.commands.onCommand.addListener((command, tab) => {
     return;
   }
 
-  console.log(`Command: ${command}`);
-
   if (command === "toggle-masking") {
     chrome.tabs.sendMessage(tab.id, { action: "toggle-masking-shortcut" });
   } else if (command === "unmask-last") {

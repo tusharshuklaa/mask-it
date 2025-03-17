@@ -22,11 +22,13 @@ function loadOptions(): void {
       theme: THEMES.dark, // Default theme
       defaultContent: "🚫", // Default content
       maskingBehavior: "__mskit_mask", // Default behavior
+      needKeyboardShortcuts: true,
     },
     (options: {
       theme: string;
       defaultContent: string;
       maskingBehavior: string;
+      needKeyboardShortcuts: boolean;
     }) => {
       const previewBox = document.getElementById(
         "previewBox"
@@ -48,6 +50,10 @@ function loadOptions(): void {
       ) as HTMLSelectElement;
       previewBox.setAttribute("data-mask-content", options.defaultContent);
       defaultContentInput.value = options.defaultContent;
+
+      // Set keyboard shortcuts
+      const kbdShortcuts = document.getElementById("needKbdShortcuts") as HTMLInputElement;
+      kbdShortcuts.checked = options.needKeyboardShortcuts;
 
       // Set masking behavior
       const maskingBehaviorRadio = document.querySelectorAll(
@@ -93,8 +99,9 @@ function saveOptions(): void {
       'input[name="masking-behavior"]:checked'
     ) as HTMLInputElement
   ).value;
+  const kbdShortcuts = document.getElementById("needKbdShortcuts") as HTMLInputElement;
 
-  chrome.storage.sync.set({ theme, defaultContent, maskingBehavior }, () => {
+  chrome.storage.sync.set({ theme, defaultContent, maskingBehavior, needKeyboardShortcuts: kbdShortcuts.checked }, () => {
     // Show confirmation
     alert("Options saved!");
   });

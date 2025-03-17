@@ -26,6 +26,7 @@
     theme: ThemeName;
     defaultContent: string;
     maskingBehavior: string;
+    needKeyboardShortcuts: boolean;
   };
 
   // Store masked elements with timestamps
@@ -55,13 +56,20 @@
   }
 
   // Load masks when page loads
-  function initializeMasks(): void {
+  async function initializeMasks(): Promise<void> {
     chrome.storage.local.get(url, function (data) {
       if (data[url] && Array.isArray(data[url])) {
         applyMasks(data[url]);
         startObserving();
       }
     });
+
+    const maskingOptions = await getMaskingOptions();
+
+    if (maskingOptions.needKeyboardShortcuts) {
+      // Initialize keyboard shortcuts
+      initKeyboardShortcutListener();
+    }
   }
 
   // Initialize masks on load
@@ -313,6 +321,7 @@
           theme: THEMES.dark,
           defaultContent: "🚫",
           maskingBehavior: "__mskit_mask",
+          needKeyboardShortcuts: true,
         },
         (options: MaskingOptions) => resolve(options)
       );
@@ -527,7 +536,4 @@
       }
     });
   }
-
-  // Initialize keyboard shortcuts
-  initKeyboardShortcutListener();
 })();
