@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,7 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            max-width: 600px;
+            max-width: 945px;
             margin: 0 auto;
         }
 
@@ -53,6 +54,8 @@
             box-shadow: rgb(201, 46, 70) 0px 0.6em 0px 0px;
             color: hsl(0, 0%, 100%);
             cursor: pointer;
+            min-width: 8rem;
+            font-size: 1rem;
         }
 
         button:hover {
@@ -78,11 +81,18 @@
 
         .container {
             display: flex;
-            gap: 4em;
+            flex-direction: column;
             align-items: center;
             border: 1px solid black;
             border-radius: 0.5rem;
             padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .theme-settings {
+            display: flex;
+            gap: 4em;
+            align-items: center;
         }
 
         .preview {
@@ -109,7 +119,7 @@
             font-size: 1rem;
         }
 
-        footer > div {
+        footer>div {
             display: flex;
             gap: 1rem;
         }
@@ -121,7 +131,7 @@
             padding: 1rem;
         }
 
-        .behaviour > div {
+        .behaviour>div {
             display: flex;
             justify-content: space-around;
         }
@@ -137,64 +147,165 @@
             text-align: center;
             margin-bottom: 3rem;
         }
+
+        .masking-behavior span {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .masking-behavior input {
+            margin-left: 1rem;
+        }
+
+        .keyboard-shortcuts {
+            font-size: 0.9rem;
+            margin: 0;
+            margin-top: 0.5rem;
+            list-style: none;
+        }
+
+        .keyboard-shortcuts li {
+            margin: 1rem auto;
+        }
+
+        .keyboard-shortcuts kbd {
+            background-color: #ff3856;
+            color: white;
+            padding: 0.4em 1em;
+            margin-right: 0.5rem;
+        }
+
+        .main {
+            width: 100%;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .info {
+            width: 20rem;
+            border: 1px solid black;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 1rem;
+            margin-top: 5.7rem;
+            height: fit-content;
+        }
+
+        details {
+            margin-bottom: 1rem;  margin-bottom: 1rem;
+            border-bottom: 1px dashed black;
+            padding-bottom: 1rem;
+        }
+
+        details:last-child {
+            border-bottom: none;
+        }
+
+        details p {
+            margin-left: 1rem;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Mask It - Options</h1>
+    <div class="main">
+        <div class="settings">
+            <h1>Mask It - Options</h1>
 
-    <!-- Masking Behavior -->
-    <div class="behaviour">
-        <label class="mini-title">Masking Behavior:</label>
-        <div>
-            <label class="masking-behavior">
-                <span>Add Masking Layer</span>
-                <input type="radio" name="masking-behavior" value="__mskit_mask" checked>
-            </label>
-            <label class="masking-behavior">
-                <span>Make Content Invisible</span>
-                <input type="radio" name="masking-behavior" value="__mskit_invisible">
-            </label>
-        </div>
-    </div>
+            <!-- Masking Behavior -->
+            <div class="behaviour">
+                <label class="mini-title">Masking Behavior</label>
+                <div>
+                    <label class="masking-behavior">
+                        <span>Add Masking Layer</span>
+                        <input type="radio" name="masking-behavior" value="__mskit_mask" checked>
+                    </label>
+                    <label class="masking-behavior">
+                        <span>Make Content Invisible</span>
+                        <input type="radio" name="masking-behavior" value="__mskit_invisible">
+                    </label>
+                </div>
+                </div>
 
-    <div class="container" id="maskOptions">
-        <div class="form">
-            <!-- Theme Selection -->
-            <label for="theme">Masked Content Theme:</label>
-            <select id="theme">
-                <option value="dark">Dark Theme</option>
-                <option value="light">Light Theme</option>
-                <option value="soothing">Soothing Theme</option>
-                <option value="lilly">Lilly Theme</option>
-                <option value="rose">Rose Theme</option>
-                <option value="sky">Sky Theme</option>
-                <option value="ocean">Ocean Theme</option>
-            </select>
+            <div class="container" id="maskOptions">
+                <h2 class="mini-title">Masking Theme</h2>
+                
+                <div class="theme-settings">
+                    <div class="form">
+                        <!-- Theme Selection -->
+                        <label for="theme">Masked Content Theme:</label>
+                        <select id="theme">
+                            <option value="dark">Dark Theme</option>
+                            <option value="light">Light Theme</option>
+                            <option value="soothing">Soothing Theme</option>
+                            <option value="lilly">Lilly Theme</option>
+                            <option value="rose">Rose Theme</option>
+                            <option value="sky">Sky Theme</option>
+                            <option value="ocean">Ocean Theme</option>
+                        </select>
 
-            <!-- Default Content -->
-            <label for="default-content">Default Content Inside Masking Box:</label>
-            <select id="default-content">
-                <option value="🚫">🚫</option>
-                <option value="">Empty</option>
-                <option value="🤐">🤐</option>
-                <option value="😶‍🌫️">😶‍🌫️</option>
-                <option value="☠️">☠️</option>
-                <option value="🙈">🙈</option>
-                <option value="🙅🏻">🙅🏻</option>
-                <option value="💩">💩</option>
-                <option value="NSFW">NSFW</option>
-                <option value="Blocked">Blocked</option>
-                <option value="Masked">Masked</option>
-            </select>
-        </div>
+                        <!-- Default Content -->
+                        <label for="default-content">Default Content Inside Masking Box:</label>
+                        <select id="default-content">
+                            <option value="🚫">🚫</option>
+                            <option value="">Empty</option>
+                            <option value="🤐">🤐</option>
+                            <option value="😶‍🌫️">😶‍🌫️</option>
+                            <option value="☠️">☠️</option>
+                            <option value="🙈">🙈</option>
+                            <option value="🙅🏻">🙅🏻</option>
+                            <option value="💩">💩</option>
+                            <option value="NSFW">NSFW</option>
+                            <option value="Blocked">Blocked</option>
+                            <option value="Masked">Masked</option>
+                        </select>
+                        </div>
 
-        <div id="previewBox" class="preview __mskit_mask __cm_dark" data-mask-content="🚫"></div>
-    </div>
+                    <div id="previewBox" class="preview __mskit_mask __cm_dark" data-mask-content="🚫"></div>
+                    </div>
+            </div>
+            
+            <div class="container keyboard-settings">
+                <label class="masking-behavior">
+                    <span>Enable keyboard shortcuts</span>
+                    <input type="checkbox" name="keyboard-shortcut" id="needKbdShortcuts" checked>
+                </label>
+            
+                <ul class="keyboard-shortcuts">
+                    <li><kbd>Alt/Option + K</kbd> Toggle Masking</li>
+                    <li><kbd>Alt/Option + L</kbd> Unmask last element</li>
+                </ul>
+            </div>
 
-    <!-- Save Button -->
-    <div class="btnContainer">
-        <button id="save">Save</button>
+            <!-- Save Button -->
+            <div class="btnContainer">
+                <button id="save">Save</button>
+            </div>
+            </div>
+            <div class="info">
+                <h3 class="mini-title">FAQs</h3>
+                <details>
+                    <summary class="details-heading">Why sometimes ADs are not masked?</summary>
+                    <p className="details-list">
+                        Ads on many websites are very dynamic in nature and it is quite tricky to identify them. We are
+                        working on improving the masking behavior for such elements.
+                    </p>
+                </details>
+                <details>
+                    <summary class="details-heading">I'm facing some issues. How do I report them?</summary>
+                    <p className="details-list">
+                        You can report any issues or bugs on our <a target="_blank" href="https://github.com/tusharshuklaa/mask-it">Github repository</a>.
+                        We will try to resolve them as soon as possible.
+                    </p>
+                </details>
+                <details>
+                    <summary class="details-heading">How do I unmask an element?</summary>
+                    <p className="details-list">
+                        You can unmask an element bly clicking on the Unmask button in the extension popup (top right corenr in browser).
+                        You can also use the keyboard shortcut Alt/Option + L to unmask the last element.
+                    </p>
+                </details>
+            </div>
     </div>
 
     <footer>
