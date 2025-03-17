@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "DOM Masker",
+    "name": "Mask It",
     "version": "1.0",
     "description": "Mask DOM elements and save selections for future visits.",
     "permissions": [

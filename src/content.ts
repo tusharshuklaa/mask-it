@@ -17,13 +17,10 @@
 
   type ThemeName = keyof typeof THEME_MAP;
 
-  const THEMES = Object.keys(THEME_MAP).reduce(
-    (theme, curr) => {
-      theme[curr as ThemeName] = curr as ThemeName;
-      return theme;
-    },
-    {} as Record<ThemeName, ThemeName>
-  );
+  const THEMES = Object.keys(THEME_MAP).reduce((theme, curr) => {
+    theme[curr as ThemeName] = curr as ThemeName;
+    return theme;
+  }, {} as Record<ThemeName, ThemeName>);
 
   type MaskingOptions = {
     theme: ThemeName;
@@ -42,7 +39,7 @@
     // If DOM has changed, reapply masks
     chrome.storage.local.get(url, (data) => {
       if (data[url] && Array.isArray(data[url])) {
-        applyMasks(data[url].map((item: MaskedElement) => item.selector));
+        applyMasks(data[url]);
       }
     });
   });
@@ -61,7 +58,7 @@
   function initializeMasks(): void {
     chrome.storage.local.get(url, function (data) {
       if (data[url] && Array.isArray(data[url])) {
-        applyMasks(data[url].map((item: MaskedElement) => item.selector));
+        applyMasks(data[url]);
         startObserving();
       }
     });
@@ -86,7 +83,7 @@
         sendResponse({ success: true });
         break;
       case "getStatus":
-        sendResponse({ isMaskingActive: isMaskingActive });
+        sendResponse({ isMaskingActive });
         break;
       case "clearMasks":
         clearMasks();
@@ -94,7 +91,7 @@
         break;
       case "getMaskedItems":
         getMaskedItems().then((items) => {
-          sendResponse({ items: items });
+          sendResponse({ items });
         });
         return true; // Keep connection open for async response
       case "unmaskElement":
@@ -104,6 +101,23 @@
     }
     return true;
   });
+
+  const replacedElements = [
+    "img",
+    "input",
+    "textarea",
+    "select",
+    "button",
+    "iframe",
+    "video",
+    "audio",
+    "canvas",
+    "object",
+    "embed",
+    "progress",
+    "meter",
+    "svg",
+  ];
 
   /**
    * Generates a unique and reliable CSS selector for any DOM element
@@ -123,12 +137,17 @@
         ["name", "role", "aria-label"].includes(attr.name)
     );
 
-    if (dataAttributes.length > 0) {
+    if (dataAttributes.length) {
       // Use attribute for selector with tag name for more specificity
-      const attr = dataAttributes[0];
-      return `${element.tagName.toLowerCase()}[${attr.name}="${CSS.escape(
-        attr.value
-      )}"]`;
+      const selector = dataAttributes.reduce((acc, attr) => {
+        return `${acc}[${attr.name}="${CSS.escape(attr.value)}"]`;
+      }, element.tagName.toLowerCase());
+
+      const matchingElements = document.querySelectorAll(selector);
+
+      if (matchingElements.length === 1) {
+        return selector;
+      }
     }
 
     // Build a selector from the element's position in its siblings
@@ -244,18 +263,34 @@
 
     // Mouse over event to highlight elements
     document.addEventListener("mouseover", mouseOverHandler);
-
-    // Click event to mask elements
-    document.addEventListener("click", clickHandler);
   }
 
   function mouseOverHandler(e: MouseEvent): void {
     if (!isMaskingActive) return;
 
     e.preventDefault();
-    e.stopPropagation();
+    e.stopImmediatePropagation();
 
-    const target = e.target as Element;
+    const element = e.target as Element;
+    const isReplacedElement = replacedElements.includes(
+      element.tagName.toLowerCase()
+    );
+    const target = isReplacedElement
+      ? element.parentElement || document.getElementsByTagName("body")[0]
+      : element;
+
+    const removeMouseLeaveListener = () => {
+      target.removeEventListener("mouseleave", removeMouseLeaveListener);
+    };
+
+    removeMouseLeaveListener();
+
+    const applyMaskFn = (e: MouseEvent) => {
+      clickHandler(e);
+    };
+
+    target.addEventListener("mousedown", applyMaskFn as EventListener);
+    target.addEventListener("mouseleave", removeMouseLeaveListener);
 
     const isAlreadyMasked = target.classList.contains(maskingClass);
 
@@ -273,12 +308,14 @@
 
   function getMaskingOptions(): Promise<MaskingOptions> {
     return new Promise((resolve) => {
-      chrome.storage.sync.get({
-        theme: THEMES.dark,
-        defaultContent: '🚫',
-        maskingBehavior: '__mskit_mask'
-      },
-      (options: MaskingOptions) => resolve(options));
+      chrome.storage.sync.get(
+        {
+          theme: THEMES.dark,
+          defaultContent: "🚫",
+          maskingBehavior: "__mskit_mask",
+        },
+        (options: MaskingOptions) => resolve(options)
+      );
     });
   }
 
@@ -291,29 +328,58 @@
     return maskingClasses;
   }
 
-  async function clickHandler(e: MouseEvent): Promise<void> {
-    if (!isMaskingActive) return;
+  async function applyMaskOnElements(
+    elements: NodeListOf<Element> | Array<Element>
+  ): Promise<void> {
+    const maskingOptions = await getMaskingOptions();
+    const allMaskingClasses = getMaskingClasses(maskingOptions);
 
-    e.preventDefault();
+    elements.forEach((el) => {
+      el.setAttribute("data-mask-content", maskingOptions.defaultContent);
+      el.classList.add(...allMaskingClasses);
+    });
+  }
+
+  async function clickHandler(e: MouseEvent): Promise<Boolean> {
+    if (!isMaskingActive) return false;
+
+    e.stopImmediatePropagation();
     e.stopPropagation();
+    e.preventDefault();
 
-    const element = e.target as Element;
+    const _tempEl = e.target as Element;
+
+    console.log('_tempEl', _tempEl);
+
+    const isReplacedElement = replacedElements.includes(
+      _tempEl.tagName.toLowerCase()
+    );
+
+    const element = isReplacedElement
+      ? _tempEl.parentElement || document.getElementsByTagName("body")[0]
+      : _tempEl;
+
+    console.log('element', element);
+
+    element.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    });
 
     // Don't mask elements that are already masked
     if (element.className.includes("__mskit")) {
-      return;
+      return false;
     }
-
-    const maskingOptions = await getMaskingOptions();
-    const allMaskingClasses = getMaskingClasses(maskingOptions);
     // Save the masked element's selector to storage
     const selector = generateUniqueSelector(element);
 
-    // Add mask class
-    element.classList.add(...allMaskingClasses);
-    element.setAttribute('data-mask-content', maskingOptions.defaultContent);
+    // Add mask class to regular elements
+    await applyMaskOnElements([element]);
 
     saveSelector(selector);
+
+    return false;
   }
 
   function deactivateMaskingMode(): void {
@@ -338,7 +404,10 @@
       // Only add the selector if it's not already saved
       if (!maskedElements.some((item) => item.selector === selector)) {
         // Remove mask class from selector
-        const maskingClasses = selector.split(".").filter((cls) => cls.startsWith("__mskit_")).map((cls) => `.${cls}`);
+        const maskingClasses = selector
+          .split(".")
+          .filter((cls) => cls.startsWith("__mskit_"))
+          .map((cls) => `.${cls}`);
         let actualSelector = selector;
         maskingClasses.forEach((cls) => {
           actualSelector = selector.replace(cls, "");
@@ -357,25 +426,25 @@
     });
   }
 
-  async function applyMasks(selectors: Array<string>): Promise<void> {
-    const maskingOptions = await getMaskingOptions();
-    const allMaskingClasses = getMaskingClasses(maskingOptions);
-
-    selectors.forEach((selector) => {
+  function applyMasks(maskedElements: Array<MaskedElement>): void {
+    maskedElements.forEach(async (item) => {
       try {
-        const elements = document.querySelectorAll(selector);
-        elements.forEach((el) => {
-          el.setAttribute('data-mask-content', maskingOptions.defaultContent);
-          el.classList.add(...allMaskingClasses);
-        });
+        const elements = document.querySelectorAll(item.selector);
+
+        if (elements.length > 0) {
+          // Apply regular masking to elements
+          await applyMaskOnElements(elements);
+        }
       } catch (e) {
-        console.error("Invalid selector:", selector, e);
+        console.error("Invalid selector:", item.selector, e);
       }
     });
   }
 
   function getElementMaskingClasses(element: Element): Array<string> {
-    return Array.from(element.classList).filter((cls) => cls.startsWith("__mskit_"));
+    return Array.from(element.classList).filter((cls) =>
+      cls.startsWith("__mskit_")
+    );
   }
 
   function clearMasks(): void {
