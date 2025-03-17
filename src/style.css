@@ -73,6 +73,15 @@
   cursor: crosshair !important;
 }
 
+.__mskit_mask-selector iframe,
+.__mskit_mask-selector a,
+.__mskit_mask-selector button,
+.__mskit_mask-selector input,
+.__mskit_mask-selector select,
+.__mskit_mask-selector textarea {
+  pointer-events: none !important;
+}
+
 .__xmskit_mask-selector-hover {
   outline: 2px dashed greenyellow !important;
 }
