@@ -1,6 +1,8 @@
 const THEME_MAP = {
   dark: "__mskit_dark",
   light: "__mskit_light",
+  glass: "__mskit_glass",
+  steel: "__mskit_steel",
   soothing: "__mskit_soothing",
   lilly: "__mskit_lilly",
   rose: "__mskit_rose",
