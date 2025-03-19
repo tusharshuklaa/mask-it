@@ -8,6 +8,8 @@
   const THEME_MAP = {
     dark: "__mskit_dark",
     light: "__mskit_light",
+    glass: "__mskit_glass",
+    steel: "__mskit_steel",
     soothing: "__mskit_soothing",
     lilly: "__mskit_lilly",
     rose: "__mskit_rose",
@@ -358,8 +360,6 @@
 
     const _tempEl = e.target as Element;
 
-    console.log('_tempEl', _tempEl);
-
     const isReplacedElement = replacedElements.includes(
       _tempEl.tagName.toLowerCase()
     );
@@ -367,8 +367,6 @@
     const element = isReplacedElement
       ? _tempEl.parentElement || document.getElementsByTagName("body")[0]
       : _tempEl;
-
-    console.log('element', element);
 
     element.addEventListener("click", (e) => {
       e.preventDefault();

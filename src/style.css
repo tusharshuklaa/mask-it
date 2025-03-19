@@ -29,6 +29,32 @@
   background: #fff !important;
 }
 
+.__mskit_mask.__mskit_glass {
+  background: rgb(150 183 255 / 10%) !important;
+  color: transparent !important;
+  text-shadow: 0 0 15px rgb(200 200 200 / 50%) !important;
+  box-shadow: inset -5px 20px 2px -20px #fff, inset 5px -20px 2px -20px #fff, inset -19px 1px 2px -20px #000, inset 19px 1px 2px -20px #000, inset 19px 1px 2px -20px #000, inset -15px -26px 3px -30px #000 !important;
+  border-radius: 10px !important;
+}
+
+.__mskit_mask.__mskit_glass::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 1px !important;
+  box-shadow: inset -5px 20px 2px -20px #fff, inset 5px -20px 2px -20px #fff, inset -19px 1px 2px -20px #000, inset 19px 1px 2px -20px #000, inset 19px 1px 2px -20px #000, inset -15px -26px 3px -30px #000 !important;
+  border-radius: 10px !important;
+}
+
+.__mskit_mask.__mskit_glass * {
+  visibility: visible !important;
+  filter: blur(15px) !important;
+}
+
+.__mskit_mask.__mskit_steel {
+  background: radial-gradient(#ffffff54 2px, transparent 0) 0 0/40px 40px, radial-gradient(#00000026 2px, transparent 0) -1px 1px/40px 40px, radial-gradient(ellipse at 150% -50%, #6d788f, #fff) !important;
+  box-shadow: inset -5px 20px 2px -20px #fff, inset 5px -20px 2px -20px #fff, inset -19px 1px 2px -20px #000, inset 19px 1px 2px -20px #000, inset 19px 1px 2px -20px #000, inset -15px -26px 3px -30px #000 !important;
+}
+
 .__mskit_mask.__mskit_soothing {
   background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%) !important;
 }
@@ -55,7 +81,8 @@
 
 .__mskit_mask::after {
   content: attr(data-mask-content) !important;
-  color: white !important;
+  color: #9b9b9b !important;
+  text-shadow: 0 0 2px white !important;
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;

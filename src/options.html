@@ -76,7 +76,7 @@
 
         .masking-behavior {
             display: flex;
-            align-items: center;
+            align-items: baseline;
         }
 
         .container {
@@ -87,6 +87,7 @@
             border-radius: 0.5rem;
             padding: 2rem;
             margin-bottom: 3rem;
+            width: 500px;
         }
 
         .theme-settings {
@@ -102,7 +103,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 1em;
-            box-shadow: 5px 5px 10px 0 lightseagreen;
+            box-shadow: inset -5px 20px 2px -20px #fff, inset 5px -20px 2px -20px #fff, inset -19px 1px 2px -20px #000, inset 19px 1px 2px -20px #000, inset 19px 1px 2px -20px #000, inset -15px -26px 3px -30px #000;
             flex: 0 0 auto;
         }
 
@@ -129,6 +130,7 @@
             border: 1px solid black;
             border-radius: 0.5rem;
             padding: 1rem;
+            width: 500px;
         }
 
         .behaviour>div {
@@ -204,6 +206,10 @@
         details p {
             margin-left: 1rem;
         }
+
+        .settings {
+            padding-bottom: 100px;
+        }
     </style>
 </head>
 
@@ -237,6 +243,8 @@
                         <select id="theme">
                             <option value="dark">Dark Theme</option>
                             <option value="light">Light Theme</option>
+                            <option value="glass">Frozen Glass Theme</option>
+                            <option value="steel">Steel Theme</option>
                             <option value="soothing">Soothing Theme</option>
                             <option value="lilly">Lilly Theme</option>
                             <option value="rose">Rose Theme</option>
@@ -259,10 +267,12 @@
                             <option value="Blocked">Blocked</option>
                             <option value="Masked">Masked</option>
                         </select>
-                        </div>
-
-                    <div id="previewBox" class="preview __mskit_mask __cm_dark" data-mask-content="🚫"></div>
                     </div>
+
+                    <div id="previewBox" class="preview __mskit_mask __cm_dark" data-mask-content="🚫">
+                        Content Preview
+                    </div>
+                </div>
             </div>
             
             <div class="container keyboard-settings">
@@ -313,6 +323,7 @@
         <div>
             <a target="_blank" href="https://github.com/tusharshuklaa/mask-it">Find this on Github</a>
             <a target="_blank" href="https://tusharshukla.dev">Created by Tushar Shukla</a>
+            <a target="_blank" href="https://www.linkedin.com/in/tusharshuklaa/">Find Tushar on LinkedIn</a>
         </div>
     </footer>
 
