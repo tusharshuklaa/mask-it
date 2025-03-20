@@ -32,6 +32,7 @@ module.exports = {
         { from: "src/popup.html", to: "." },
         { from: "src/options.html", to: "." },
         { from: "src/style.css", to: "." },
+        { from: "src/options.css", to: "." },
         { from: "icons", to: "icons" },
       ],
     }),
