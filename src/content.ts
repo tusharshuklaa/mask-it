@@ -296,7 +296,9 @@
     removeMouseLeaveListener();
 
     const applyMaskFn = (e: MouseEvent) => {
-      clickHandler(e);
+      if (e.button === 0) {
+        clickHandler(e);
+      }
     };
 
     target.addEventListener("mousedown", applyMaskFn as EventListener);

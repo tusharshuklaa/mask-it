@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
         { action: "getStatus" },
         function (response: { isMaskingActive: boolean } | undefined) {
           if (response && response.isMaskingActive) {
-            toggleButton.textContent = "Stop Masking Elements";
+            toggleButton.textContent = "Stop Masking";
             toggleButton.classList.add("__mskit_active");
           }
         }

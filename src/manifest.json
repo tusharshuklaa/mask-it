@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Mask It",
     "version": "1.0",
-    "description": "Mask DOM elements and save selections for future visits.",
+    "description": "Mask DOM elements for privacy in open & public areas and save selections for future visits.",
     "permissions": [
         "storage",
         "activeTab",
